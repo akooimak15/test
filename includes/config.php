@@ -4,8 +4,8 @@
 // ============================================================
 
 define('SITE_NAME',    'My Portfolio & Blog');
-define('SITE_AUTHOR',  'Your Name');
-define('SITE_DESC',    'エンジニアのポートフォリオ兼技術ブログ');
+define('SITE_AUTHOR',  'akooimak15');
+define('SITE_DESC',    '高校生エンジニア');
 
 // -------------------------------------------------------
 // サイトのベースURL（末尾スラッシュなし）

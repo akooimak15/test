@@ -124,9 +124,9 @@ $page_desc  = SITE_DESC;
     <div class="hero-bg"></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-        <div class="hero-eyebrow">Available for work</div>
+        <div class="hero-eyebrow">🚧 絶賛制作中</div>
         <h1 class="hero-title">Hi, I'm<br><span class="accent"><?= e(SITE_AUTHOR) ?></span>.</h1>
-        <p class="hero-sub">[ ここに自己紹介・キャッチコピーを入れる ]<br>エンジニア / クリエイター / ブロガー</p>
+        <p class="hero-sub">論理的思考と柔軟な発想の共存<br>高校生エンジニア / akooimak15</p>
         <div class="hero-cta">
             <a href="<?= BASE_URL ?>/blog.php" class="btn-hp">📝 Blog を読む</a>
             <a href="#about" class="btn-hg">About Me ↓</a>
@@ -154,14 +154,15 @@ $page_desc  = SITE_DESC;
         <div class="section-eyebrow">About Me</div>
         <div class="about-grid">
             <div class="about-avatar-wrap">
-                <div class="about-avatar">👤
-                    <div class="about-badge">🚀 Open to work</div>
+                <div class="about-avatar" style="background:none;box-shadow:0 24px 64px rgba(0,0,0,.3);">
+                    <img src="<?= BASE_URL ?>/assets/avatar.png" alt="akooimak15" style="width:100%;height:100%;object-fit:cover;border-radius:24px;">
+                    <div class="about-badge">🚧 絶賛制作中</div>
                 </div>
             </div>
             <div class="about-text">
-                <h2 class="section-title" style="margin-bottom:24px;">[ 名前・肩書きを入れる ]</h2>
-                <p>[ 自己紹介・経歴などをここに書く。どんな技術が好きか、どんなものを作ってきたかなど。 ]</p>
-                <p>[ 趣味・モチベーション・目標なども自由に書いてOK。 ]</p>
+                <h2 class="section-title" style="margin-bottom:24px;">akooimak15</h2>
+                <p>中学時代よりプログラミングに親しみ、現在は「論理的思考と柔軟な発想の共存」をテーマに開発を行っています。</p>
+                
                 <div class="skill-tags">
                     <span class="skill-tag">PHP</span>
                     <span class="skill-tag">JavaScript</span>
@@ -196,7 +197,7 @@ $page_desc  = SITE_DESC;
             <p>[ 連絡先・SNS・GitHub などのリンクをここに設定する ]</p>
             <div class="contact-links">
                 <a href="mailto:your@email.com" class="clink primary">✉ メールを送る</a>
-                <a href="https://github.com/" class="clink" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://github.com/akooimak15" class="clink" target="_blank" rel="noopener">GitHub</a>
                 <a href="<?= BASE_URL ?>/blog.php" class="clink">Blog を読む</a>
             </div>
         </div>
