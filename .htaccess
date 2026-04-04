@@ -1,0 +1,35 @@
+# ============================================================
+# .htaccess — セキュリティ設定
+# （Apache / Termux上のhttpdで有効）
+# ============================================================
+
+Options -Indexes
+Options -MultiViews
+
+# dataディレクトリへの直接アクセスを拒否
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # dataフォルダへのアクセス禁止
+    RewriteRule ^data/ - [F,L]
+</IfModule>
+
+# .envや設定ファイルへのアクセス禁止
+<FilesMatch "\.(env|db|sqlite|log|sh|bak)$">
+    Require all denied
+</FilesMatch>
+
+# セキュリティヘッダー
+<IfModule mod_headers.c>
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# PHPの設定
+<IfModule mod_php.c>
+    php_flag display_errors Off
+    php_value session.cookie_httponly 1
+    php_value session.use_strict_mode 1
+</IfModule>

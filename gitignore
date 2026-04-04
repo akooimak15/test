@@ -1,0 +1,13 @@
+# SQLiteデータベース（本番はRailwayの永続ボリュームに置く）
+data/blog.db
+
+# PHPキャッシュ
+*.cache
+
+# OS系
+.DS_Store
+Thumbs.db
+
+# エディタ系
+.vscode/
+.idea/
