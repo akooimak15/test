@@ -124,7 +124,7 @@ $page_desc  = SITE_DESC;
     <div class="hero-bg"></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-        <div class="hero-eyebrow">🚧 絶賛制作中</div>
+        <div class="hero-eyebrow">絶賛制作中</div>
         <h1 class="hero-title">Hi, I'm<br><span class="accent"><?= e(SITE_AUTHOR) ?></span>.</h1>
         <p class="hero-sub">論理的思考と柔軟な発想の共存<br>高校生エンジニア / akooimak15</p>
         <div class="hero-cta">
