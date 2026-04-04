@@ -1,25 +1,18 @@
-FROM php:8.2-fpm-alpine
+FROM ubuntu:22.04
 
-# SQLite + nginx インストール
-RUN apk add --no-cache nginx sqlite-dev \
-    && docker-php-ext-install pdo_sqlite
+ENV DEBIAN_FRONTEND=noninteractive
 
-# nginx設定
-RUN mkdir -p /run/nginx
-COPY docker/nginx.conf /etc/nginx/nginx.conf
+RUN apt-get update && apt-get install -y \
+    php8.1 \
+    php8.1-sqlite3 \
+    php8.1-cli \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# ファイルをコピー
-COPY . /var/www/html/
+WORKDIR /app
+COPY . /app/
 
-# パーミッション設定
-RUN mkdir -p /var/www/html/data \
-    && chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html \
-    && chmod -R 775 /var/www/html/data
+RUN mkdir -p /app/data && chmod -R 777 /app/data
 
-# 起動スクリプト
-COPY docker/start.sh /start.sh
-RUN chmod +x /start.sh
+EXPOSE 8080
 
-EXPOSE 80
-CMD ["/start.sh"]
+CMD ["php", "-S", "0.0.0.0:8080", "-t", "/app"]
