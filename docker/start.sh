@@ -1,11 +1,16 @@
 #!/bin/sh
 set -e
 
-# php-fpmをバックグラウンドで起動
+echo "=== Starting php-fpm ==="
 php-fpm &
+FPM_PID=$!
 
-# nginxが使えるまで少し待つ
-sleep 1
+echo "=== Checking nginx ==="
+which nginx
+nginx -v
 
-# nginxをフォアグラウンドで起動（これがメインプロセス）
+echo "=== Testing nginx config ==="
+nginx -t
+
+echo "=== Starting nginx ==="
 exec nginx -g 'daemon off;'
