@@ -32,7 +32,7 @@ $page_desc  = SITE_DESC;
 
     /* ===== HERO ===== */
     .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;text-align:center}
-    .hero-bg{position:absolute;inset:0;background:url('<?= BASE_URL ?>/assets/bg_hero.jpg') center/cover no-repeat;animation:bgDrift 20s ease-in-out infinite alternate;z-index:0}
+    .hero-bg{position:absolute;inset:0;background:url('<?= BASE_URL ?>/assets/bg_hero.webp') center/cover no-repeat;animation:bgDrift 20s ease-in-out infinite alternate;z-index:0}
     @keyframes bgDrift{0%{transform:scale(1.08)}100%{transform:scale(1.14) translate(-2%,-1%)}}
     .hero-overlay{position:absolute;inset:0;background:linear-gradient(160deg,rgba(0,20,60,.6) 0%,rgba(0,60,160,.25) 50%,rgba(0,0,0,.65) 100%);z-index:1}
 
@@ -107,7 +107,7 @@ $page_desc  = SITE_DESC;
 
     /* ===== CONTACT ===== */
     .contact-box{border-radius:28px;padding:72px 48px;text-align:center;position:relative;overflow:hidden;background:linear-gradient(135deg,#1a3a8f,#5b21b6)}
-    .contact-box::before{content:'';position:absolute;inset:0;background:url('<?= BASE_URL ?>/assets/bg_hero.jpg') center/cover;opacity:.07}
+    .contact-box::before{content:'';position:absolute;inset:0;background:url('<?= BASE_URL ?>/assets/bg_hero.webp') center/cover;opacity:.07}
     .contact-box::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 60% 40%,rgba(167,139,250,.2),transparent 60%);pointer-events:none}
     .contact-box h2{font-family:var(--zen);font-size:clamp(1.8rem,4vw,2.6rem);color:#fff;margin-bottom:16px;position:relative;z-index:1}
     .contact-box p{color:rgba(255,255,255,.65);margin-bottom:40px;font-size:1rem;position:relative;z-index:1}
