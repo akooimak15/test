@@ -223,7 +223,7 @@ $page_desc  = SITE_DESC;
             <div class="about-avatar-wrap reveal-left">
                 <div class="about-glow"></div>
                 <div class="about-avatar">
-                    <img src="<?= BASE_URL ?>/assets/avatar.webp" alt="akooimak15">
+                    <img src="<?= BASE_URL ?>/assets/avatar.png" alt="akooimak15">
                     <div class="about-badge">🚧 絶賛制作中</div>
                 </div>
             </div>
