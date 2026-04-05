@@ -210,6 +210,14 @@
 .article-body a { border-bottom: 1px solid currentColor; }
 .article-body a:hover { opacity: 0.8; }
 
+.article-body img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 1.4em auto;
+    border-radius: 12px;
+}
+
 .article-body strong { font-weight: 700; }
 .article-body em     { font-style: italic; color: var(--color-text-sub); }
 

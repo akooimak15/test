@@ -25,6 +25,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               ? $_POST['status']
               : 'draft';
 
+    if (!empty($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
+        $allowed_types = [
+            'image/png'  => 'png',
+            'image/jpeg' => 'jpg',
+            'image/webp' => 'webp',
+            'image/gif'  => 'gif',
+        ];
+
+        if ($_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+            $errors[] = '画像のアップロードに失敗しました。';
+        } else {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime  = finfo_file($finfo, $_FILES['image']['tmp_name']);
+            finfo_close($finfo);
+
+            if (!isset($allowed_types[$mime])) {
+                $errors[] = '対応していない画像形式です。PNG / JPEG / GIF / WebP をご利用ください。';
+            } elseif ($_FILES['image']['size'] > 5 * 1024 * 1024) {
+                $errors[] = '画像は5MB以下にしてください。';
+            } else {
+                $upload_dir = __DIR__ . '/../assets/uploads';
+                if (!is_dir($upload_dir)) {
+                    mkdir($upload_dir, 0755, true);
+                }
+
+                $filename = 'img_' . time() . '_' . bin2hex(random_bytes(6)) . '.' . $allowed_types[$mime];
+                $dest     = $upload_dir . '/' . $filename;
+
+                if (!move_uploaded_file($_FILES['image']['tmp_name'], $dest)) {
+                    $errors[] = '画像の保存に失敗しました。';
+                } else {
+                    $image_url = BASE_URL . '/assets/uploads/' . $filename;
+                    $body .= "\n\n![]({$image_url})\n";
+                }
+            }
+        }
+    }
+
     if (empty($title)) $errors[] = 'タイトルは必須です。';
     if (empty($body))  $errors[] = '本文は必須です。';
 
@@ -136,7 +174,7 @@ $page_heading = $is_new ? '新規記事作成' : '記事を編集';
         </div>
     <?php endif; ?>
 
-    <form method="POST" action="/admin/edit.php<?= $id ? "?id={$id}" : '' ?>">
+    <form method="POST" action="/admin/edit.php<?= $id ? "?id={$id}" : '' ?>" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
 
         <div class="form-card">
@@ -196,6 +234,19 @@ $page_heading = $is_new ? '新規記事作成' : '記事を編集';
                 </div>
 
                 <p class="form-hint">Markdownが使えます。コードブロックは ```lang で言語を指定できます。</p>
+            </div>
+
+            <!-- 画像アップロード -->
+            <div class="form-group">
+                <label class="form-label" for="image">画像アップロード</label>
+                <input
+                    class="form-input"
+                    type="file"
+                    id="image"
+                    name="image"
+                    accept="image/png,image/jpeg,image/gif,image/webp"
+                >
+                <p class="form-hint">JPEG / PNG / GIF / WebP 形式を最大 5MB までアップロードできます。アップロード後、本文末尾にMarkdown画像として挿入されます。</p>
             </div>
 
             <!-- タグ -->
@@ -293,8 +344,8 @@ function simpleMarkdown(text) {
         .replace(/```(\w*)\n?([\s\S]*?)```/g, (_,l,c) =>
             `<pre><code class="language-${l}">${c.trim()}</code></pre>`)
         .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">')
         .replace(/^#{6} (.+)$/gm,'<h6>$1</h6>')
-        .replace(/^#{5} (.+)$/gm,'<h5>$1</h5>')
         .replace(/^#{4} (.+)$/gm,'<h4>$1</h4>')
         .replace(/^#{3} (.+)$/gm,'<h3>$1</h3>')
         .replace(/^#{2} (.+)$/gm,'<h2>$1</h2>')
