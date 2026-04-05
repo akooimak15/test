@@ -128,7 +128,23 @@ $page_desc  = SITE_DESC;
     .reveal-right{opacity:0;transform:translateX(40px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
     .reveal-right.visible{opacity:1;transform:translateX(0)}
 
+
+    /* ===== ハンバーガーメニュー（スマホのみ） ===== */
+    .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;border:none;background:none;z-index:200}
+    .hamburger span{display:block;width:24px;height:2px;background:#fff;border-radius:2px;transition:all .3s}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+    .hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+    .nav-drawer{position:fixed;inset:0;background:rgba(6,13,31,.97);backdrop-filter:blur(20px);z-index:150;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .3s}
+    .nav-drawer.open{opacity:1;pointer-events:all}
+    .nav-drawer a{font-family:var(--zen);font-size:1.8rem;color:rgba(255,255,255,.7);text-decoration:none;padding:12px 32px;transition:color .2s}
+    .nav-drawer a:hover{color:#7dd3fc}
+
     @media(max-width:768px){
+        .hamburger{display:flex}
+        .nav-links{display:none}
+
         .about-grid{grid-template-columns:1fr;gap:48px;text-align:center}
         .about-avatar{width:200px;height:200px;margin:0 auto}
         .skill-tags{justify-content:center}
@@ -142,6 +158,11 @@ $page_desc  = SITE_DESC;
 <body>
 
 <!-- ===== NAV ===== -->
+<div class="nav-drawer" id="nav-drawer">
+    <a href="<?= BASE_URL ?>/" onclick="closeDrawer()">Portfolio</a>
+    <a href="<?= BASE_URL ?>/journey.php" onclick="closeDrawer()">My Journey</a>
+    <a href="<?= BASE_URL ?>/blog.php" onclick="closeDrawer()">Blog</a>
+</div>
 <header class="site-header" id="site-header">
     <nav class="nav-inner">
         <a href="<?= BASE_URL ?>/" class="site-logo"><?= e(SITE_NAME) ?></a>
@@ -150,6 +171,9 @@ $page_desc  = SITE_DESC;
             <li><a href="<?= BASE_URL ?>/journey.php">My Journey</a></li>
             <li><a href="<?= BASE_URL ?>/blog.php">Blog</a></li>
         </ul>
+        <button class="hamburger" id="hamburger" onclick="toggleDrawer()" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
     </nav>
 </header>
 
@@ -258,6 +282,18 @@ $page_desc  = SITE_DESC;
 </footer>
 
 <script>
+// ハンバーガーメニュー
+function toggleDrawer(){
+    document.getElementById('hamburger').classList.toggle('open');
+    document.getElementById('nav-drawer').classList.toggle('open');
+    document.body.style.overflow = document.getElementById('nav-drawer').classList.contains('open') ? 'hidden' : '';
+}
+function closeDrawer(){
+    document.getElementById('hamburger').classList.remove('open');
+    document.getElementById('nav-drawer').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
 // ナビスクロール
 const header = document.getElementById('site-header');
 window.addEventListener('scroll', () => {
