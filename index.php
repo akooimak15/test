@@ -20,7 +20,7 @@ $page_desc  = SITE_DESC;
     :root{--zen:'Zen Kurenaido',sans-serif}
 
     /* ===== NAV ===== */
-    .site-header{background:rgba(6,13,31,.55);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid rgba(255,255,255,.08);transition:background .4s,box-shadow .4s;height:64px}
+    .site-header{background:transparent;backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid rgba(255,255,255,.08);transition:background .4s,box-shadow .4s;height:64px}
     .site-header.scrolled{background:rgba(6,13,31,.75);box-shadow:0 4px 32px rgba(0,0,0,.5);border-bottom-color:rgba(255,255,255,.12)}
     .nav-inner{height:100%;max-width:1200px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between}
     .site-logo{font-family:var(--zen);font-size:1.3rem;color:#fff;letter-spacing:.05em;text-shadow:0 0 20px rgba(125,211,252,.5)}
