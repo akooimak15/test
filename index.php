@@ -20,8 +20,8 @@ $page_desc  = SITE_DESC;
     :root{--zen:'Zen Kurenaido',sans-serif}
 
     /* ===== NAV ===== */
-    .site-header{background:transparent;border-bottom:none;transition:background .5s,box-shadow .5s;height:64px}
-    .site-header.scrolled{background:rgba(5,10,30,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 2px 32px rgba(0,0,0,.4)}
+    .site-header{background:rgba(6,13,31,.55);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid rgba(255,255,255,.08);transition:background .4s,box-shadow .4s;height:64px}
+    .site-header.scrolled{background:rgba(6,13,31,.85);box-shadow:0 4px 32px rgba(0,0,0,.5);border-bottom-color:rgba(255,255,255,.12)}
     .nav-inner{height:100%;max-width:1200px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between}
     .site-logo{font-family:var(--zen);font-size:1.3rem;color:#fff;letter-spacing:.05em;text-shadow:0 0 20px rgba(125,211,252,.5)}
     .site-logo:hover{color:#7dd3fc}
@@ -32,7 +32,7 @@ $page_desc  = SITE_DESC;
 
     /* ===== HERO ===== */
     .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;text-align:center}
-    .hero-bg{position:absolute;inset:0;background:url('<?= BASE_URL ?>/assets/bg_hero.jpg') center/cover no-repeat;animation:bgDrift 20s ease-in-out infinite alternate;z-index:0}
+    .hero-bg{position:absolute;inset:0;background:url('<?= BASE_URL ?>/assets/bg_hero.webp') center/cover no-repeat;animation:bgDrift 20s ease-in-out infinite alternate;z-index:0}
     @keyframes bgDrift{0%{transform:scale(1.08)}100%{transform:scale(1.14) translate(-2%,-1%)}}
     .hero-overlay{position:absolute;inset:0;background:linear-gradient(160deg,rgba(0,20,60,.6) 0%,rgba(0,60,160,.25) 50%,rgba(0,0,0,.65) 100%);z-index:1}
 
@@ -107,7 +107,7 @@ $page_desc  = SITE_DESC;
 
     /* ===== CONTACT ===== */
     .contact-box{border-radius:28px;padding:72px 48px;text-align:center;position:relative;overflow:hidden;background:linear-gradient(135deg,#1a3a8f,#5b21b6)}
-    .contact-box::before{content:'';position:absolute;inset:0;background:url('<?= BASE_URL ?>/assets/bg_hero.jpg') center/cover;opacity:.07}
+    .contact-box::before{content:'';position:absolute;inset:0;background:url('<?= BASE_URL ?>/assets/bg_hero.webp') center/cover;opacity:.07}
     .contact-box::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 60% 40%,rgba(167,139,250,.2),transparent 60%);pointer-events:none}
     .contact-box h2{font-family:var(--zen);font-size:clamp(1.8rem,4vw,2.6rem);color:#fff;margin-bottom:16px;position:relative;z-index:1}
     .contact-box p{color:rgba(255,255,255,.65);margin-bottom:40px;font-size:1rem;position:relative;z-index:1}
@@ -128,7 +128,23 @@ $page_desc  = SITE_DESC;
     .reveal-right{opacity:0;transform:translateX(40px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
     .reveal-right.visible{opacity:1;transform:translateX(0)}
 
+
+    /* ===== ハンバーガーメニュー（スマホのみ） ===== */
+    .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;border:none;background:none;z-index:200}
+    .hamburger span{display:block;width:24px;height:2px;background:#fff;border-radius:2px;transition:all .3s}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+    .hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+    .nav-drawer{position:fixed;inset:0;background:rgba(6,13,31,.97);backdrop-filter:blur(20px);z-index:150;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .3s}
+    .nav-drawer.open{opacity:1;pointer-events:all}
+    .nav-drawer a{font-family:var(--zen);font-size:1.8rem;color:rgba(255,255,255,.7);text-decoration:none;padding:12px 32px;transition:color .2s}
+    .nav-drawer a:hover{color:#7dd3fc}
+
     @media(max-width:768px){
+        .hamburger{display:flex}
+        .nav-links{display:none}
+
         .about-grid{grid-template-columns:1fr;gap:48px;text-align:center}
         .about-avatar{width:200px;height:200px;margin:0 auto}
         .skill-tags{justify-content:center}
@@ -142,6 +158,11 @@ $page_desc  = SITE_DESC;
 <body>
 
 <!-- ===== NAV ===== -->
+<div class="nav-drawer" id="nav-drawer">
+    <a href="<?= BASE_URL ?>/" onclick="closeDrawer()">Portfolio</a>
+    <a href="<?= BASE_URL ?>/journey.php" onclick="closeDrawer()">My Journey</a>
+    <a href="<?= BASE_URL ?>/blog.php" onclick="closeDrawer()">Blog</a>
+</div>
 <header class="site-header" id="site-header">
     <nav class="nav-inner">
         <a href="<?= BASE_URL ?>/" class="site-logo"><?= e(SITE_NAME) ?></a>
@@ -150,6 +171,9 @@ $page_desc  = SITE_DESC;
             <li><a href="<?= BASE_URL ?>/journey.php">My Journey</a></li>
             <li><a href="<?= BASE_URL ?>/blog.php">Blog</a></li>
         </ul>
+        <button class="hamburger" id="hamburger" onclick="toggleDrawer()" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
     </nav>
 </header>
 
@@ -258,6 +282,18 @@ $page_desc  = SITE_DESC;
 </footer>
 
 <script>
+// ハンバーガーメニュー
+function toggleDrawer(){
+    document.getElementById('hamburger').classList.toggle('open');
+    document.getElementById('nav-drawer').classList.toggle('open');
+    document.body.style.overflow = document.getElementById('nav-drawer').classList.contains('open') ? 'hidden' : '';
+}
+function closeDrawer(){
+    document.getElementById('hamburger').classList.remove('open');
+    document.getElementById('nav-drawer').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
 // ナビスクロール
 const header = document.getElementById('site-header');
 window.addEventListener('scroll', () => {

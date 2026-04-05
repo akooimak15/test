@@ -20,7 +20,7 @@ $page_desc  = 'akooimak15のプログラミング遍歴';
     body{background:#060d1f;color:#fff;font-family:var(--font-sans)}
 
     /* NAV */
-    .site-header{background:rgba(6,13,31,.9);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.06);height:64px}
+    .site-header{background:rgba(6,13,31,.55);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid rgba(255,255,255,.08);height:64px}
     .nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;height:100%;display:flex;align-items:center;justify-content:space-between}
     .site-logo{font-family:var(--zen);font-size:1.3rem;color:#fff}
     .site-logo:hover{color:var(--blue)}
@@ -82,26 +82,70 @@ $page_desc  = 'akooimak15のプログラミング遍歴';
     .site-footer{background:#030810;border-top:1px solid rgba(255,255,255,.04)}
     .site-footer .footer-inner{color:rgba(255,255,255,.25);text-align:center;padding:32px;font-size:.85rem}
 
+    /* ハンバーガーメニュー */
+    .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;border:none;background:none}
+    .hamburger span{display:block;width:24px;height:2px;background:#fff;border-radius:2px;transition:all .3s}
+    .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+    .hamburger.open span:nth-child(2){opacity:0}
+    .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+    .nav-drawer{position:fixed;inset:0;background:rgba(6,13,31,.97);backdrop-filter:blur(20px);z-index:150;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .3s}
+    .nav-drawer.open{opacity:1;pointer-events:all}
+    .nav-drawer a{font-family:var(--zen);font-size:1.8rem;color:rgba(255,255,255,.7);text-decoration:none;padding:12px 32px;transition:color .2s}
+    .nav-drawer a:hover{color:var(--blue)}
+
     @media(max-width:640px){
-        .timeline-wrap::before{left:24px}
-        .timeline-item{grid-template-columns:48px 1fr;margin-bottom:40px}
-        .timeline-item:nth-child(odd){transform:translateX(-20px)}
-        .timeline-item:nth-child(even){transform:translateX(20px)}
-        .timeline-item .timeline-right,
-        .timeline-item .timeline-left{display:none!important}
+        /* ナビ */
+        .hamburger{display:flex}
+        .nav-links{display:none}
+
+        /* タイムライン：左右をやめて縦1列シンプルに */
+        .timeline-wrap::before{left:20px;transform:none}
+        .timeline-wrap{padding:16px 16px 80px 16px}
+        .timeline-item{
+            display:flex;
+            flex-direction:row;
+            gap:16px;
+            margin-bottom:32px;
+            opacity:0;
+            transform:translateY(20px);
+        }
+        .timeline-item.visible{opacity:1;transform:translateY(0)}
+        /* 左右カラムを非表示、ドットとカードだけ表示 */
+        .timeline-left,.timeline-right{display:none!important}
+        .timeline-center{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            padding-top:6px;
+            flex-shrink:0;
+        }
+        .timeline-dot{display:block}
+        .timeline-dot-inner{margin:0}
+        /* カードを直接並べる */
+        .timeline-item::after{display:none}
+
+        /* 全アイテムにカードを強制表示 */
         .timeline-item:nth-child(odd) .timeline-left,
-        .timeline-item:nth-child(even) .timeline-left{display:none}
+        .timeline-item:nth-child(even) .timeline-right{
+            display:flex!important;
+            flex:1;
+        }
         .timeline-item:nth-child(odd) .timeline-right,
-        .timeline-item:nth-child(even) .timeline-right{display:none}
-        .timeline-dot{grid-column:1;align-items:flex-start;padding-top:6px}
-        .timeline-card-wrap{grid-column:2}
-        .timeline-item:nth-child(odd) .timeline-left{visibility:visible;display:none}
-        .timeline-item:nth-child(even) .timeline-right{visibility:visible;display:none}
+        .timeline-item:nth-child(even) .timeline-left{display:none!important}
+        .timeline-card{padding:18px 20px}
+        .timeline-year{font-size:1rem}
+        .timeline-card-title{font-size:.95rem}
+        .timeline-card-body{font-size:.82rem}
     }
     </style>
 </head>
 <body>
 
+<div class="nav-drawer" id="nav-drawer">
+    <a href="<?= BASE_URL ?>/" onclick="closeDrawer()">Portfolio</a>
+    <a href="<?= BASE_URL ?>/journey.php" onclick="closeDrawer()">My Journey</a>
+    <a href="<?= BASE_URL ?>/blog.php" onclick="closeDrawer()">Blog</a>
+</div>
 <header class="site-header">
     <nav class="nav-inner">
         <a href="<?= BASE_URL ?>/" class="site-logo"><?= e(SITE_NAME) ?></a>
@@ -110,6 +154,9 @@ $page_desc  = 'akooimak15のプログラミング遍歴';
             <li><a href="<?= BASE_URL ?>/journey.php" class="active">My Journey</a></li>
             <li><a href="<?= BASE_URL ?>/blog.php">Blog</a></li>
         </ul>
+        <button class="hamburger" id="hamburger" onclick="toggleDrawer()" aria-label="メニュー">
+            <span></span><span></span><span></span>
+        </button>
     </nav>
 </header>
 
@@ -222,6 +269,16 @@ $page_desc  = 'akooimak15のプログラミング遍歴';
 </footer>
 
 <script>
+function toggleDrawer(){
+    document.getElementById('hamburger').classList.toggle('open');
+    document.getElementById('nav-drawer').classList.toggle('open');
+    document.body.style.overflow = document.getElementById('nav-drawer').classList.contains('open') ? 'hidden' : '';
+}
+function closeDrawer(){
+    document.getElementById('hamburger').classList.remove('open');
+    document.getElementById('nav-drawer').classList.remove('open');
+    document.body.style.overflow = '';
+}
 const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry, i) => {
         if(entry.isIntersecting){
