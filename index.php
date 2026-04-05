@@ -161,7 +161,7 @@ $page_desc  = SITE_DESC;
     <div class="hero-content">
         <div class="hero-eyebrow">
             <span class="hero-eyebrow-dot"></span>
-            🚧 絶賛制作中
+             絶賛制作中
         </div>
         <div class="hero-title">Hi, I'm</div>
         <div class="hero-title-sub"><span class="accent"><?= e(SITE_AUTHOR) ?></span>.</div>
@@ -199,7 +199,7 @@ $page_desc  = SITE_DESC;
                 <div class="about-glow"></div>
                 <div class="about-avatar">
                     <img src="<?= BASE_URL ?>/assets/avatar.png" alt="akooimak15">
-                    <div class="about-badge">🚧 絶賛制作中</div>
+                    <div class="about-badge">絶賛制作中</div>
                 </div>
             </div>
             <div class="about-text reveal-right">
@@ -266,7 +266,7 @@ window.addEventListener('scroll', () => {
 
 // パーティクル生成
 const pc = document.getElementById('particles');
-for(let i = 0; i < 28; i++){
+for(let i = 0; i < 50; i++){
     const p = document.createElement('div');
     p.className = 'particle';
     const size = Math.random() * 4 + 1;
