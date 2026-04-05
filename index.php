@@ -11,17 +11,20 @@ $page_desc  = SITE_DESC;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e(SITE_NAME) ?></title>
     <meta name="description" content="<?= e($page_desc) ?>">
+    <link rel="preload" href="<?= BASE_URL ?>/assets/bg_hero.webp" as="image" fetchpriority="high">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Zen+Kurenaido&display=swap" rel="stylesheet">
+    <!-- Fontsを非同期で読み込み（レンダリングブロック解消） -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Zen+Kurenaido&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Zen+Kurenaido&display=swap" rel="stylesheet"></noscript>
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/main.css">
     <style>
     *{margin:0;padding:0;box-sizing:border-box}
     :root{--zen:'Zen Kurenaido',sans-serif}
 
     /* ===== NAV ===== */
-    .site-header{background:transparent;backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid rgba(255,255,255,.08);transition:background .4s,box-shadow .4s;height:64px}
-    .site-header.scrolled{background:rgba(6,13,31,.75);box-shadow:0 4px 32px rgba(0,0,0,.5);border-bottom-color:rgba(255,255,255,.12)}
+    .site-header{background:rgba(6,13,31,.55)!important;backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid rgba(255,255,255,.08)!important;transition:background .4s,box-shadow .4s;height:64px}
+    .site-header.scrolled{background:rgba(6,13,31,.95)!important;box-shadow:0 4px 32px rgba(0,0,0,.5);border-bottom-color:rgba(255,255,255,.12)!important}
     .nav-inner{height:100%;max-width:1200px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between}
     .site-logo{font-family:var(--zen);font-size:1.3rem;color:#fff;letter-spacing:.05em;text-shadow:0 0 20px rgba(125,211,252,.5)}
     .site-logo:hover{color:#7dd3fc}
@@ -31,8 +34,8 @@ $page_desc  = SITE_DESC;
     .nav-links a.active{color:#7dd3fc;border-color:rgba(125,211,252,.3);background:rgba(125,211,252,.08)}
 
     /* ===== HERO ===== */
-    .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;text-align:center;background:#030810}
-    .hero-bg{position:absolute;inset:0;background:url('<?= BASE_URL ?>/assets/bg_hero.webp') center/cover no-repeat;background-attachment:fixed;animation:bgDrift 20s ease-in-out infinite alternate;z-index:0}
+    .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;text-align:center}
+    .hero-bg{position:absolute;inset:0;background:url('<?= BASE_URL ?>/assets/bg_hero.webp') center/cover no-repeat;animation:bgDrift 20s ease-in-out infinite alternate;z-index:0}
     @keyframes bgDrift{0%{transform:scale(1.08)}100%{transform:scale(1.14) translate(-2%,-1%)}}
     .hero-overlay{position:absolute;inset:0;background:linear-gradient(160deg,rgba(0,20,60,.6) 0%,rgba(0,60,160,.25) 50%,rgba(0,0,0,.65) 100%);z-index:1}
 
@@ -185,7 +188,7 @@ $page_desc  = SITE_DESC;
     <div class="hero-content">
         <div class="hero-eyebrow">
             <span class="hero-eyebrow-dot"></span>
-             絶賛制作中
+            🚧 絶賛制作中
         </div>
         <div class="hero-title">Hi, I'm</div>
         <div class="hero-title-sub"><span class="accent"><?= e(SITE_AUTHOR) ?></span>.</div>
@@ -222,8 +225,8 @@ $page_desc  = SITE_DESC;
             <div class="about-avatar-wrap reveal-left">
                 <div class="about-glow"></div>
                 <div class="about-avatar">
-                    <img src="<?= BASE_URL ?>/assets/avatar.png" alt="akooimak15">
-                    <div class="about-badge">絶賛制作中</div>
+                    <img src="<?= BASE_URL ?>/assets/avatar.webp" alt="akooimak15">
+                    <div class="about-badge">🚧 絶賛制作中</div>
                 </div>
             </div>
             <div class="about-text reveal-right">
@@ -302,7 +305,7 @@ window.addEventListener('scroll', () => {
 
 // パーティクル生成
 const pc = document.getElementById('particles');
-for(let i = 0; i < 50; i++){
+for(let i = 0; i < 28; i++){
     const p = document.createElement('div');
     p.className = 'particle';
     const size = Math.random() * 4 + 1;
