@@ -20,7 +20,7 @@ $page_desc  = 'akooimak15のプログラミング遍歴';
     body{background:#060d1f;color:#fff;font-family:var(--font-sans)}
 
     /* NAV */
-    .site-header{background:rgba(6,13,31,.9);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.06);height:64px}
+    .site-header{background:rgba(6,13,31,.55);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid rgba(255,255,255,.08);height:64px}
     .nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;height:100%;display:flex;align-items:center;justify-content:space-between}
     .site-logo{font-family:var(--zen);font-size:1.3rem;color:#fff}
     .site-logo:hover{color:var(--blue)}
