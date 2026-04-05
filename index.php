@@ -31,7 +31,7 @@ $page_desc  = SITE_DESC;
     .nav-links a.active{color:#7dd3fc;border-color:rgba(125,211,252,.3);background:rgba(125,211,252,.08)}
 
     /* ===== HERO ===== */
-    .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;text-align:center}
+    .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;text-align:center;background:#030810}
     .hero-bg{position:absolute;inset:0;background:url('<?= BASE_URL ?>/assets/bg_hero.webp') center/cover no-repeat;background-attachment:fixed;animation:bgDrift 20s ease-in-out infinite alternate;z-index:0}
     @keyframes bgDrift{0%{transform:scale(1.08)}100%{transform:scale(1.14) translate(-2%,-1%)}}
     .hero-overlay{position:absolute;inset:0;background:linear-gradient(160deg,rgba(0,20,60,.6) 0%,rgba(0,60,160,.25) 50%,rgba(0,0,0,.65) 100%);z-index:1}
