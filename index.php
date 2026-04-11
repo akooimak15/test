@@ -181,18 +181,18 @@ $page_desc  = SITE_DESC;
 </header>
 
 <!-- ===== ABOUT ===== -->
-<section id="about" class="section section-dark" style="padding-top:140px;">
+<section id="about" class="section section-dark" style="padding-top:100px;">
     <div class="section-inner">
         <div class="section-eyebrow">About Me</div>
         <div class="about-grid">
-            <div class="about-avatar-wrap reveal-left">
+            <div class="about-avatar-wrap">
                 <div class="about-glow"></div>
                 <div class="about-avatar">
                     <img src="<?= BASE_URL ?>/assets/avatar.webp" alt="akooimak15">
                     <div class="about-badge">🚧 絶賛制作中</div>
                 </div>
             </div>
-            <div class="about-text reveal-right">
+            <div class="about-text">
                 <h2 class="section-title" style="margin-bottom:24px;"><?= e(SITE_AUTHOR) ?></h2>
                 <p>中学時代よりプログラミングに親しみ、現在は「論理的思考と柔軟な発想の共存」をテーマに開発を行っています。</p>
                 <p style="margin-top:12px;">
@@ -291,7 +291,7 @@ const observer = new IntersectionObserver((entries) => {
             setTimeout(() => entry.target.classList.add('visible'), i * 100);
         }
     });
-}, {threshold:0.12});
+}, {threshold:0.05, rootMargin:'0px 0px -50px 0px'});
 
 document.querySelectorAll('.stat-item, .reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
 
