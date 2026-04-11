@@ -181,14 +181,14 @@ $page_desc  = SITE_DESC;
 </header>
 
 <!-- ===== ABOUT ===== -->
-<section id="about" class="section section-dark" style="padding-top:100px;">
+<section id="about" class="section section-dark" style="padding-top:32px;">
     <div class="section-inner">
         <div class="section-eyebrow">About Me</div>
         <div class="about-grid">
             <div class="about-avatar-wrap">
                 <div class="about-glow"></div>
                 <div class="about-avatar">
-                    <img src="<?= BASE_URL ?>/assets/avatar.webp" alt="akooimak15">
+                    <img src="<?= BASE_URL ?>/assets/avatar.png" alt="akooimak15">
                     <div class="about-badge">🚧 絶賛制作中</div>
                 </div>
             </div>
@@ -216,12 +216,12 @@ $page_desc  = SITE_DESC;
 <!-- ===== WORKS ===== -->
 <section id="works" class="section section-light">
     <div class="section-inner">
-        <div class="section-eyebrow reveal" style="color:#3ea8ff;">Works</div>
-        <h2 class="section-title reveal">制作物</h2>
+        <div class="section-eyebrow" style="color:#3ea8ff;">Works</div>
+        <h2 class="section-title">制作物</h2>
         <div class="works-grid">
-            <div class="work-placeholder reveal"><span>＋</span><strong>作品を追加</strong><p>プロジェクト・制作物・OSSなどをここに掲載する</p></div>
-            <div class="work-placeholder reveal"><span>＋</span><strong>作品を追加</strong><p>GitHub リポジトリのリンクなど</p></div>
-            <div class="work-placeholder reveal"><span>＋</span><strong>作品を追加</strong><p>デモサイト・スクリーンショットなど</p></div>
+            <div class="work-placeholder"><span>＋</span><strong>作品を追加</strong><p>プロジェクト・制作物・OSSなどをここに掲載する</p></div>
+            <div class="work-placeholder"><span>＋</span><strong>作品を追加</strong><p>GitHub リポジトリのリンクなど</p></div>
+            <div class="work-placeholder"><span>＋</span><strong>作品を追加</strong><p>デモサイト・スクリーンショットなど</p></div>
         </div>
     </div>
 </section>
@@ -229,7 +229,7 @@ $page_desc  = SITE_DESC;
 <!-- ===== CONTACT ===== -->
 <section id="contact" class="section section-dark" style="padding-top:0;">
     <div class="section-inner">
-        <div class="contact-box reveal">
+        <div class="contact-box">
             <h2>一緒に何か作りませんか？</h2>
             <p>高校生エンジニア akooimak15 へのお問い合わせはこちら</p>
             <div class="contact-links">
