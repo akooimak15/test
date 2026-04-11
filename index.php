@@ -23,6 +23,8 @@ $page_desc  = SITE_DESC;
     :root{--zen:'Zen Kurenaido',sans-serif}
 
     /* ===== NAV ===== */
+    .site-header{background:rgba(6,13,31,.55)!important;backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);border-bottom:1px solid rgba(255,255,255,.08)!important;transition:background .4s,box-shadow .4s;height:64px}
+    .site-header.scrolled{background:rgba(6,13,31,.95)!important;box-shadow:0 4px 32px rgba(0,0,0,.5);border-bottom-color:rgba(255,255,255,.12)!important}
     .nav-inner{height:100%;max-width:1200px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between}
     .site-logo{font-family:var(--zen);font-size:1.3rem;color:#fff;letter-spacing:.05em;text-shadow:0 0 20px rgba(125,211,252,.5)}
     .site-logo:hover{color:#7dd3fc}
@@ -178,52 +180,15 @@ $page_desc  = SITE_DESC;
     </nav>
 </header>
 
-<!-- ===== HERO ===== -->
-<section class="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-overlay"></div>
-    <div class="hero-particles" id="particles"></div>
-    <div class="hero-content">
-        <div class="hero-eyebrow">
-            <span class="hero-eyebrow-dot"></span>
-            🚧 絶賛制作中
-        </div>
-        <div class="hero-title">Hi, I'm</div>
-        <div class="hero-title-sub"><span class="accent"><?= e(SITE_AUTHOR) ?></span>.</div>
-        <p class="hero-sub">
-            論理的思考と柔軟な発想の共存<br>
-            高校生エンジニア
-        </p>
-        <div class="hero-cta">
-            <a href="<?= BASE_URL ?>/journey.php" class="btn-hp">🗺 My Journey</a>
-            <a href="<?= BASE_URL ?>/blog.php" class="btn-hg">📝 Blog</a>
-        </div>
-    </div>
-    <div class="scroll-hint">
-        <div class="scroll-line"></div>
-        <span>scroll</span>
-    </div>
-</section>
-
-<!-- ===== STATS ===== -->
-<div class="stats-bar">
-    <div class="stats-inner">
-        <div class="stat-item"><div class="stat-num" data-count="0">0</div><div class="stat-label">Projects</div></div>
-        <div class="stat-item"><div class="stat-num" data-count="0">0</div><div class="stat-label">Blog Posts</div></div>
-        <div class="stat-item"><div class="stat-num" data-count="0">0</div><div class="stat-label">Technologies</div></div>
-        <div class="stat-item"><div class="stat-num">∞</div><div class="stat-label">Curiosity</div></div>
-    </div>
-</div>
-
 <!-- ===== ABOUT ===== -->
-<section id="about" class="section section-dark">
+<section id="about" class="section section-dark" style="padding-top:140px;">
     <div class="section-inner">
         <div class="section-eyebrow">About Me</div>
         <div class="about-grid">
             <div class="about-avatar-wrap reveal-left">
                 <div class="about-glow"></div>
                 <div class="about-avatar">
-                    <img src="<?= BASE_URL ?>/assets/avatar.png" alt="akooimak15">
+                    <img src="<?= BASE_URL ?>/assets/avatar.webp" alt="akooimak15">
                     <div class="about-badge">🚧 絶賛制作中</div>
                 </div>
             </div>
