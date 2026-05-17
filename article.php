@@ -16,7 +16,7 @@ if (!$article) {
     echo '<div class="container" style="padding:80px 24px;text-align:center;">';
     echo '<h1 style="font-size:4rem;color:var(--color-border);">404</h1>';
     echo '<p style="color:var(--color-text-sub);margin-top:16px;">お探しの記事は見つかりませんでした。</p>';
-    echo '<a href="/blog.php" class="btn btn-primary" style="margin-top:24px;">記事一覧に戻る</a>';
+    echo '<a href="' . BASE_URL . '/blog.php" class="btn btn-primary" style="margin-top:24px;">記事一覧に戻る</a>';
     echo '</div>';
     include __DIR__ . '/includes/footer.php';
     exit;
@@ -33,7 +33,7 @@ include __DIR__ . '/includes/header.php';
 <div class="article-page">
 
     <!-- 戻るリンク -->
-    <a href="/blog.php" class="back-link">記事一覧</a>
+    <a href="<?= BASE_URL ?>/blog.php" class="back-link">記事一覧</a>
 
     <!-- 記事ヘッダー -->
     <header class="article-header">
@@ -68,7 +68,7 @@ include __DIR__ . '/includes/header.php';
 
     <!-- フッターナビ -->
     <div style="margin-top:64px;padding-top:32px;border-top:1px solid var(--color-border);">
-        <a href="/blog.php" class="back-link">記事一覧に戻る</a>
+        <a href="<?= BASE_URL ?>/blog.php" class="back-link">記事一覧に戻る</a>
     </div>
 
 </div>

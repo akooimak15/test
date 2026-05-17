@@ -31,8 +31,8 @@ $updated  = isset($_GET['updated']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ダッシュボード | <?= e(SITE_NAME) ?></title>
-    <link rel="stylesheet" href="/assets/css/main.css">
-    <link rel="stylesheet" href="/assets/css/blog.css">
+    <link rel="stylesheet" href="/assets/css/main.css?v=14">
+    <link rel="stylesheet" href="/assets/css/blog.css?v=14">
 </head>
 <body class="admin-body">
 
@@ -65,7 +65,7 @@ $updated  = isset($_GET['updated']);
             <a href="/admin/edit.php" class="btn btn-primary" style="margin-top:20px;">最初の記事を書く</a>
         </div>
     <?php else: ?>
-        <div style="overflow-x:auto;">
+        <div class="admin-table-wrapper">
             <table class="admin-table">
                 <thead>
                     <tr>

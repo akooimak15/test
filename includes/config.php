@@ -19,8 +19,10 @@ if (getenv('RAILWAY_PUBLIC_DOMAIN')) {
 } elseif (getenv('BASE_URL')) {
     define('BASE_URL', getenv('BASE_URL'));
 } else {
-    $port = ($_SERVER['SERVER_PORT'] ?? 80) != 80 ? ':' . $_SERVER['SERVER_PORT'] : '';
-    define('BASE_URL', 'http://localhost' . $port);
+    $protocol = (isset($_SERVER['HTTP_X_FORWARDED_PROTO'])) ? $_SERVER['HTTP_X_FORWARDED_PROTO'] : 
+                ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http');
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    define('BASE_URL', $protocol . '://' . $host);
 }
 
 // SQLiteデータベースファイルのパス（webroot外に置くとより安全）
@@ -37,3 +39,10 @@ date_default_timezone_set('Asia/Tokyo');
 // エラー表示（本番環境では0に）
 ini_set('display_errors', 0);
 error_reporting(E_ALL);
+
+/**
+ * XSS対策のエスケープ用ヘルパー
+ */
+function e(?string $str): string {
+    return htmlspecialchars($str ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+}

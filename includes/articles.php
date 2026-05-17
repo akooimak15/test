@@ -21,28 +21,78 @@ function make_slug(string $title): string {
 
 /**
  * 公開記事一覧を取得（ページング対応）
+ *
+ * @param ?string $q   フリーワード（タイトル/本文/タグ）
+ * @param ?string $tag タグ（単一）
  */
-function get_published_articles(int $page = 1, int $per_page = 10): array {
+function get_published_articles(int $page = 1, int $per_page = 10, ?string $q = null, ?string $tag = null): array {
     $db     = get_db();
     $offset = ($page - 1) * $per_page;
-    $stmt   = $db->prepare("
+
+    $where  = ["status = 'published'"];
+    $params = [];
+
+    $q = $q !== null ? trim($q) : '';
+    if ($q !== '') {
+        $like = '%' . escape_like($q) . '%';
+        $where[] = "(title LIKE ? ESCAPE '\\' OR body LIKE ? ESCAPE '\\' OR tags LIKE ? ESCAPE '\\')";
+        $params[] = $like;
+        $params[] = $like;
+        $params[] = $like;
+    }
+
+    $tag = $tag !== null ? normalize_tag($tag) : '';
+    if ($tag !== '') {
+        $where[] = "(',' || replace(tags, ' ', '') || ',') LIKE ?";
+        $params[] = '%,' . $tag . ',%';
+    }
+
+    $sql = "
         SELECT id, title, slug, tags, created_at,
                substr(body, 1, 200) AS excerpt
         FROM   articles
-        WHERE  status = 'published'
+        WHERE  " . implode(' AND ', $where) . "
         ORDER  BY created_at DESC
         LIMIT  ? OFFSET ?
-    ");
-    $stmt->execute([$per_page, $offset]);
+    ";
+
+    $stmt = $db->prepare($sql);
+    $params[] = $per_page;
+    $params[] = $offset;
+    $stmt->execute($params);
     return $stmt->fetchAll();
 }
 
 /**
  * 公開記事の総数
+ *
+ * @param ?string $q   フリーワード（タイトル/本文/タグ）
+ * @param ?string $tag タグ（単一）
  */
-function count_published_articles(): int {
+function count_published_articles(?string $q = null, ?string $tag = null): int {
     $db = get_db();
-    return (int)$db->query("SELECT COUNT(*) FROM articles WHERE status='published'")->fetchColumn();
+
+    $where  = ["status = 'published'"];
+    $params = [];
+
+    $q = $q !== null ? trim($q) : '';
+    if ($q !== '') {
+        $like = '%' . escape_like($q) . '%';
+        $where[] = "(title LIKE ? ESCAPE '\\' OR body LIKE ? ESCAPE '\\' OR tags LIKE ? ESCAPE '\\')";
+        $params[] = $like;
+        $params[] = $like;
+        $params[] = $like;
+    }
+
+    $tag = $tag !== null ? normalize_tag($tag) : '';
+    if ($tag !== '') {
+        $where[] = "(',' || replace(tags, ' ', '') || ',') LIKE ?";
+        $params[] = '%,' . $tag . ',%';
+    }
+
+    $stmt = $db->prepare("SELECT COUNT(*) FROM articles WHERE " . implode(' AND ', $where));
+    $stmt->execute($params);
+    return (int)$stmt->fetchColumn();
 }
 
 /**
@@ -117,34 +167,41 @@ function delete_article(int $id): void {
  * Termux環境での依存を最小限に抑えるため自前実装
  */
 function parse_markdown(string $text): string {
+    $has_toc = preg_match('/^\s*\[{1,2}toc\]{1,2}\s*$/im', $text) === 1;
+    if ($has_toc) {
+        $text = preg_replace('/^\s*\[{1,2}toc\]{1,2}\s*$/im', "\n\n[[TOC]]\n\n", $text);
+    }
+
+    $code_blocks = [];
+    $text = preg_replace_callback('/```(\w*)\n?([\s\S]*?)```/m', function($m) use (&$code_blocks) {
+        $idx = count($code_blocks);
+        $code_blocks[] = ['lang' => (string)$m[1], 'code' => (string)$m[2]];
+        return "\n\n[[CB{$idx}]]\n\n";
+    }, $text);
+
     $text = htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
-    // コードブロック（```...```）を先に処理
-    $text = preg_replace_callback('/```(\w*)\n?(.*?)```/s', function($m) {
-        $lang = htmlspecialchars($m[1]);
-        $code = $m[2];
-        $attr = $lang ? " class=\"language-{$lang}\" data-lang=\"{$lang}\"" : '';
-        return "<pre><code{$attr}>{$code}</code></pre>";
+    $headings = [];
+    $used_ids = [];
+    $text = preg_replace_callback('/^(#{1,6})\s(.+)$/m', function($m) use (&$headings, &$used_ids) {
+        $level = strlen($m[1]);
+        $title = trim($m[2]);
+
+        $plain = trim(strip_tags($title));
+        $plain_for_id = html_entity_decode($plain, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $id = make_heading_id($plain_for_id, $used_ids);
+
+        $headings[] = ['level' => $level, 'title' => $plain, 'id' => $id];
+        return "<h{$level} id=\"{$id}\">{$title}</h{$level}>";
     }, $text);
 
     // インラインコード
     $text = preg_replace('/`([^`]+)`/', '<code>$1</code>', $text);
 
-    // 見出し
-    $text = preg_replace('/^#{6}\s(.+)$/m', '<h6>$1</h6>', $text);
-    $text = preg_replace('/^#{5}\s(.+)$/m', '<h5>$1</h5>', $text);
-    $text = preg_replace('/^#{4}\s(.+)$/m', '<h4>$1</h4>', $text);
-    $text = preg_replace('/^#{3}\s(.+)$/m', '<h3>$1</h3>', $text);
-    $text = preg_replace('/^#{2}\s(.+)$/m', '<h2>$1</h2>', $text);
-    $text = preg_replace('/^#{1}\s(.+)$/m', '<h1>$1</h1>', $text);
-
     // 太字・斜体
     $text = preg_replace('/\*\*\*(.+?)\*\*\*/', '<strong><em>$1</em></strong>', $text);
     $text = preg_replace('/\*\*(.+?)\*\*/', '<strong>$1</strong>', $text);
     $text = preg_replace('/\*(.+?)\*/', '<em>$1</em>', $text);
-
-    // 画像
-    $text = preg_replace('/!\[([^\]]*)\]\(([^)]+)\)/', '<img src="$2" alt="$1">', $text);
 
     // 画像
     $text = preg_replace('/!\[([^\]]*)\]\(([^)]+)\)/', '<img src="$2" alt="$1">', $text);
@@ -157,7 +214,9 @@ function parse_markdown(string $text): string {
 
     // 箇条書き
     $text = preg_replace('/^[-*]\s(.+)$/m', '<li>$1</li>', $text);
-    $text = preg_replace('/(<li>.*<\/li>)/s', '<ul>$1</ul>', $text);
+    $text = preg_replace_callback('/(?:^<li>.*<\/li>\s*)+/m', function($m) {
+        return "<ul>{$m[0]}</ul>";
+    }, $text);
 
     // 番号付きリスト
     $text = preg_replace('/^\d+\.\s(.+)$/m', '<li>$1</li>', $text);
@@ -165,9 +224,24 @@ function parse_markdown(string $text): string {
     // 段落（空行で区切られたテキスト）
     $paragraphs = preg_split('/\n{2,}/', $text);
     $result = [];
+    $toc_html = $has_toc ? build_toc_html($headings) : '';
     foreach ($paragraphs as $p) {
         $p = trim($p);
         if (empty($p)) continue;
+        if (preg_match('/^\[\[CB(\d+)\]\]$/', $p, $m)) {
+            $idx = (int)$m[1];
+            $lang = $code_blocks[$idx]['lang'] ?? '';
+            $code = $code_blocks[$idx]['code'] ?? '';
+            $lang_attr = $lang !== '' ? htmlspecialchars($lang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : '';
+            $code_escaped = htmlspecialchars(rtrim($code, "\n"), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $attr = $lang_attr !== '' ? " class=\"language-{$lang_attr}\" data-lang=\"{$lang_attr}\"" : '';
+            $result[] = "<pre><code{$attr}>{$code_escaped}</code></pre>";
+            continue;
+        }
+        if ($p === '[[TOC]]') {
+            if ($toc_html !== '') $result[] = $toc_html;
+            continue;
+        }
         // すでにブロック要素の場合はそのまま
         if (preg_match('/^<(h[1-6]|ul|ol|li|pre|hr|blockquote)/', $p)) {
             $result[] = $p;
@@ -180,16 +254,96 @@ function parse_markdown(string $text): string {
     return implode("\n", $result);
 }
 
+function make_heading_id(string $text, array &$used_ids): string {
+    $t = mb_strtolower($text, 'UTF-8');
+    $t = preg_replace('/[^\p{L}\p{N}]+/u', '-', $t);
+    $t = trim($t, '-');
+    if ($t === '') $t = 'section';
+
+    $id = $t;
+    $i = 2;
+    while (isset($used_ids[$id])) {
+        $id = $t . '-' . $i;
+        $i++;
+    }
+    $used_ids[$id] = true;
+    return $id;
+}
+
+function build_toc_html(array $headings): string {
+    $toc = [];
+    $current = -1;
+
+    foreach ($headings as $h) {
+        $level = (int)($h['level'] ?? 0);
+        if ($level === 2) {
+            $toc[] = ['id' => (string)$h['id'], 'title' => (string)$h['title'], 'children' => []];
+            $current = count($toc) - 1;
+        } elseif ($level === 3 && $current >= 0) {
+            $toc[$current]['children'][] = ['id' => (string)$h['id'], 'title' => (string)$h['title']];
+        }
+    }
+
+    if (empty($toc)) return '';
+
+    $html = '<nav class="toc" aria-label="目次">';
+    $html .= '<div class="toc-title">目次</div>';
+    $html .= '<ul class="toc-list">';
+
+    foreach ($toc as $h2) {
+        $html .= '<li><a href="#' . $h2['id'] . '">' . $h2['title'] . '</a>';
+        if (!empty($h2['children'])) {
+            $html .= '<ul class="toc-sub">';
+            foreach ($h2['children'] as $h3) {
+                $html .= '<li><a href="#' . $h3['id'] . '">' . $h3['title'] . '</a></li>';
+            }
+            $html .= '</ul>';
+        }
+        $html .= '</li>';
+    }
+
+    $html .= '</ul></nav>';
+    return $html;
+}
+
 /**
  * タグ文字列を配列に変換
  */
-function parse_tags(string $tags): array {
+function parse_tags(?string $tags): array {
+    if (!$tags) return [];
     return array_filter(array_map('trim', explode(',', $tags)));
 }
 
 /**
- * XSS対策のエスケープ
+ * LIKE検索用にワイルドカード文字をエスケープ
  */
-function e(string $str): string {
-    return htmlspecialchars($str, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+function escape_like(string $value): string {
+    return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
+}
+
+/**
+ * タグの比較用正規化
+ */
+function normalize_tag(string $tag): string {
+    return trim(str_replace(' ', '', $tag));
+}
+
+/**
+ * 公開記事に含まれるタグ一覧（ユニーク・昇順）
+ */
+function get_published_tags(): array {
+    $db = get_db();
+    $rows = $db->query("SELECT tags FROM articles WHERE status = 'published'")->fetchAll();
+
+    $set = [];
+    foreach ($rows as $row) {
+        foreach (parse_tags($row['tags'] ?? '') as $tag) {
+            $t = normalize_tag($tag);
+            if ($t !== '') $set[$t] = true;
+        }
+    }
+
+    $tags = array_keys($set);
+    natcasesort($tags);
+    return array_values($tags);
 }

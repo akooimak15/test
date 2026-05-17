@@ -14,6 +14,61 @@ $article = $id > 0 ? get_article_by_id($id) : null;
 $is_new  = $article === null;
 $errors  = [];
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'upload_image') {
+    header('Content-Type: application/json; charset=utf-8');
+    verify_csrf();
+
+    if (empty($_FILES['image']) || $_FILES['image']['error'] === UPLOAD_ERR_NO_FILE) {
+        echo json_encode(['ok' => false, 'error' => '画像ファイルを選択してください。'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $allowed_types = [
+        'image/png'  => 'png',
+        'image/jpeg' => 'jpg',
+        'image/webp' => 'webp',
+        'image/gif'  => 'gif',
+    ];
+
+    if ($_FILES['image']['error'] !== UPLOAD_ERR_OK) {
+        echo json_encode(['ok' => false, 'error' => '画像のアップロードに失敗しました。'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime  = finfo_file($finfo, $_FILES['image']['tmp_name']);
+    finfo_close($finfo);
+
+    if (!isset($allowed_types[$mime])) {
+        echo json_encode(['ok' => false, 'error' => '対応していない画像形式です。PNG / JPEG / GIF / WebP をご利用ください。'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+    if ($_FILES['image']['size'] > 5 * 1024 * 1024) {
+        echo json_encode(['ok' => false, 'error' => '画像は5MB以下にしてください。'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    $upload_dir = __DIR__ . '/../assets/uploads';
+    if (!is_dir($upload_dir)) {
+        mkdir($upload_dir, 0755, true);
+    }
+    @chmod($upload_dir, 0755);
+
+    $filename = 'img_' . time() . '_' . bin2hex(random_bytes(6)) . '.' . $allowed_types[$mime];
+    $dest     = $upload_dir . '/' . $filename;
+
+    if (!move_uploaded_file($_FILES['image']['tmp_name'], $dest)) {
+        echo json_encode(['ok' => false, 'error' => '画像の保存に失敗しました。'], JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    @chmod($dest, 0644);
+
+    $image_path = '/assets/uploads/' . $filename;
+    echo json_encode(['ok' => true, 'url' => $image_path], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 // フォーム送信処理
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf();
@@ -56,8 +111,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!move_uploaded_file($_FILES['image']['tmp_name'], $dest)) {
                     $errors[] = '画像の保存に失敗しました。';
                 } else {
-                    $image_url = BASE_URL . '/assets/uploads/' . $filename;
-                    $body .= "\n\n![]({$image_url})\n";
+                    @chmod($upload_dir, 0755);
+                    @chmod($dest, 0644);
+                    $image_path = '/assets/uploads/' . $filename;
+                    $body .= "\n\n![]({$image_path})\n";
                 }
             }
         }
@@ -89,16 +146,14 @@ $page_heading = $is_new ? '新規記事作成' : '記事を編集';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($page_heading) ?> | <?= e(SITE_NAME) ?></title>
-    <link rel="stylesheet" href="/assets/css/main.css">
-    <link rel="stylesheet" href="/assets/css/blog.css">
+    <link rel="stylesheet" href="/assets/css/all.css?v=14">
     <style>
-        /* エディタのツールバー */
         .editor-toolbar {
             display: flex;
             gap: 6px;
             flex-wrap: wrap;
             padding: 10px 14px;
-            background: var(--color-bg-sub);
+            background: var(--color-surface);
             border: 1px solid var(--color-border);
             border-bottom: none;
             border-radius: var(--radius-sm) var(--radius-sm) 0 0;
@@ -107,7 +162,7 @@ $page_heading = $is_new ? '新規記事作成' : '記事を編集';
             padding: 5px 10px;
             font-size: 0.78rem;
             font-weight: 600;
-            background: #fff;
+            background: #242933;
             border: 1px solid var(--color-border);
             border-radius: 4px;
             cursor: pointer;
@@ -122,16 +177,17 @@ $page_heading = $is_new ? '新規記事作成' : '記事を編集';
         }
         .editor-area {
             border-radius: 0 0 var(--radius-sm) var(--radius-sm) !important;
+            min-height: 55vh;
+            height: 55vh;
+            resize: vertical;
         }
-        /* プレビュー */
         .preview-wrap {
-            background: var(--color-bg-sub);
+            background: var(--color-surface);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-sm);
             padding: 24px;
-            min-height: 200px;
+            min-height: 55vh;
         }
-        /* タブ切替 */
         .tab-bar { display: flex; gap: 0; margin-bottom: 0; }
         .tab-btn {
             padding: 8px 18px;
@@ -147,9 +203,13 @@ $page_heading = $is_new ? '新規記事作成' : '記事を編集';
         }
         .tab-btn:first-child { border-radius: var(--radius-sm) 0 0 0; }
         .tab-btn:last-child  { border-radius: 0 var(--radius-sm) 0 0; }
-        .tab-btn.active { background: #fff; color: var(--color-text); border-bottom-color: #fff; }
+        .tab-btn.active { background: var(--color-surface); color: var(--color-text); border-bottom-color: var(--color-surface); }
         .tab-panel { display: none; }
         .tab-panel.active { display: block; }
+        @media (max-width: 640px) {
+            .editor-area { min-height: 48vh; height: 48vh; }
+            .preview-wrap { min-height: 48vh; padding: 18px; }
+        }
     </style>
 </head>
 <body class="admin-body">
@@ -239,13 +299,17 @@ $page_heading = $is_new ? '新規記事作成' : '記事を編集';
             <!-- 画像アップロード -->
             <div class="form-group">
                 <label class="form-label" for="image">画像アップロード</label>
-                <input
-                    class="form-input"
-                    type="file"
-                    id="image"
-                    name="image"
-                    accept="image/png,image/jpeg,image/gif,image/webp"
-                >
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                    <input
+                        class="form-input"
+                        type="file"
+                        id="image"
+                        name="image"
+                        accept="image/png,image/jpeg,image/gif,image/webp"
+                    >
+                    <button type="button" class="btn btn-secondary" id="insert-image-btn">挿入</button>
+                    <span id="insert-image-status" style="color:var(--color-text-sub);font-size:0.85rem;"></span>
+                </div>
                 <p class="form-hint">JPEG / PNG / GIF / WebP 形式を最大 5MB までアップロードできます。アップロード後、本文末尾にMarkdown画像として挿入されます。</p>
             </div>
 
@@ -364,6 +428,56 @@ function simpleMarkdown(text) {
         return `<p>${p.replace(/\n/g,'<br>')}</p>`;
     }).join('\n');
 }
+</script>
+
+<script>
+function insertAtCursor(text) {
+    const ta = document.getElementById('body');
+    if (!ta) return;
+    const s = ta.selectionStart ?? ta.value.length;
+    const e = ta.selectionEnd ?? ta.value.length;
+    ta.setRangeText(text, s, e, 'end');
+    ta.focus();
+}
+
+async function uploadAndInsertImage() {
+    const fileInput = document.getElementById('image');
+    const statusEl = document.getElementById('insert-image-status');
+    const form = document.querySelector('form');
+
+    if (!fileInput || !form) return;
+    if (!fileInput.files || fileInput.files.length === 0) {
+        if (statusEl) statusEl.textContent = '画像を選択してください';
+        return;
+    }
+
+    const csrf = form.querySelector('input[name="csrf_token"]')?.value || '';
+    const actionUrl = form.getAttribute('action') || window.location.pathname;
+
+    const fd = new FormData();
+    fd.append('csrf_token', csrf);
+    fd.append('action', 'upload_image');
+    fd.append('image', fileInput.files[0]);
+
+    if (statusEl) statusEl.textContent = 'アップロード中...';
+
+    try {
+        const res = await fetch(actionUrl, { method: 'POST', body: fd });
+        const data = await res.json();
+        if (!data || !data.ok) {
+            if (statusEl) statusEl.textContent = data?.error || 'アップロードに失敗しました';
+            return;
+        }
+
+        insertAtCursor(`\n\n![](${data.url})\n\n`);
+        if (statusEl) statusEl.textContent = '挿入しました';
+        fileInput.value = '';
+    } catch (e) {
+        if (statusEl) statusEl.textContent = '通信に失敗しました';
+    }
+}
+
+document.getElementById('insert-image-btn')?.addEventListener('click', uploadAndInsertImage);
 </script>
 
 </body>
